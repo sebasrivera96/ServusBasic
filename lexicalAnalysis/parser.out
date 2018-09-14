@@ -1,0 +1,94 @@
+Created by PLY version 3.11 (http://www.dabeaz.com/ply)
+
+Unused terminals:
+
+    ERROR
+
+Grammar
+
+Rule 0     S' -> S
+Rule 1     S -> X QUE TAL
+Rule 2     X -> X COMA HOLA
+Rule 3     X -> HOLA
+Rule 4     empty -> <empty>
+
+Terminals, with rules where they appear
+
+COMA                 : 2
+ERROR                : 
+HOLA                 : 2 3
+QUE                  : 1
+TAL                  : 1
+error                : 
+
+Nonterminals, with rules where they appear
+
+S                    : 0
+X                    : 1 2
+empty                : 
+
+Parsing method: LALR
+
+state 0
+
+    (0) S' -> . S
+    (1) S -> . X QUE TAL
+    (2) X -> . X COMA HOLA
+    (3) X -> . HOLA
+
+    HOLA            shift and go to state 1
+
+    X                              shift and go to state 2
+    S                              shift and go to state 3
+
+state 1
+
+    (3) X -> HOLA .
+
+    QUE             reduce using rule 3 (X -> HOLA .)
+    COMA            reduce using rule 3 (X -> HOLA .)
+
+
+state 2
+
+    (1) S -> X . QUE TAL
+    (2) X -> X . COMA HOLA
+
+    QUE             shift and go to state 4
+    COMA            shift and go to state 5
+
+
+state 3
+
+    (0) S' -> S .
+
+
+
+state 4
+
+    (1) S -> X QUE . TAL
+
+    TAL             shift and go to state 6
+
+
+state 5
+
+    (2) X -> X COMA . HOLA
+
+    HOLA            shift and go to state 7
+
+
+state 6
+
+    (1) S -> X QUE TAL .
+
+    $end            reduce using rule 1 (S -> X QUE TAL .)
+
+
+state 7
+
+    (2) X -> X COMA HOLA .
+
+    QUE             reduce using rule 2 (X -> X COMA HOLA .)
+    COMA            reduce using rule 2 (X -> X COMA HOLA .)
+
