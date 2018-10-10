@@ -1,20 +1,31 @@
 '''
     TODO:
     - Add the UMINUS token for negative numbers
+    - On the assignation expression, let matrixs be permited
+    - CREAR un varName para que este pueda tener loc [] de un arreglo
 '''
 import ply.lex as lex
 import ply.yacc as yacc
 from symbolTable import *
 import sys
 
-servusSymbolTable = SymbolTable() 
+# servusSymbolTable = SymbolTable() 
 
 testProgram = ''' start; 
-frei; 
-dim A1, A2, B1, B2 als float;
-dim MAT1 als float[100][100];
-dim MAT2 als float[100][100];
-dim MAT3 als float[100][100];
+def MULTIPLY_MATS{
+    fur i <- 0 in A1{
+        fur j <- 0 in B2{
+            dim sum als float;
+            lass sum <- 0;
+            fur k <- 0 in A2{
+               lass sum <- sum + MAT1[i][k] * MAT2[k][j];
+            }
+            lass MAT3[i][j] <- sum;
+        }
+    }
+    return
+}
+# COMMENT LINE TESTING
 ende; '''
 
 reserved = {
@@ -38,10 +49,11 @@ reserved = {
     'oder' : 'ODER',
     'druck' : 'DRUCK',
     'solange' : 'SOLANGE',
-    'waerend' : 'WAEREND'
+    'waerend' : 'WAEREND',
+    'lass' : 'LASS'
 }
 
-literals = "+!@$/&^()[]{}+=_?;:,<>.|%"
+literals = "+!@$/&*^()[]{}+=_?;:,<>.|%"
 
 tokens = [
     'ID', 
@@ -63,7 +75,7 @@ def t_COMMENT(t):
     pass
 
 def t_ID(t):
-    r'[a-zA-Z_][a-zA-Z_\d]*'
+    r'[a-zA-Z_][a-zA-Z_\d\[\]]*'
     t.type = reserved.get(t.value,'ID')    # Check for reserved words
     return t
 
@@ -111,7 +123,7 @@ def testLexer():
     for tok in lexer:
         print(tok)
 
-# testLexer()
+testLexer()
 
 # Here begins the PARSER
 
@@ -132,7 +144,7 @@ def p_S(p):
         | while
         | DIM declareVariable 
         | EINGABE input ';'
-        | DEF ID '{' S RETURN ';' '}'
+        | DEF ID '{' S RETURN '}'
         | GOSUB ID ';'
     """
 
@@ -166,11 +178,12 @@ def p_for(p):
         | FLOAT_NUMBER
     forTarget : INTEGER_NUMBER
         | FLOAT_NUMBER
+        | ID
     """
 
 def p_let(p):
     """
-    let : ID LINKER_PFEIL letAssignation ';'
+    let : LASS ID LINKER_PFEIL letAssignation ';'
     letAssignation : arithmeticExpression
         | logicExpression
         | booleanAssignation
@@ -193,8 +206,9 @@ def p_declareVariable(p):
 
 def p_input(p):
     """
-    input : ID ',' input
-        | ID ';'
+    input : ID input1
+    input1 : ',' ID
+        | empty
     """
 
 precedence = (
