@@ -1,15 +1,14 @@
 '''
     TODO:
     - Add the UMINUS token for negative numbers
-    - On the assignation expression, let matrixs be permited
-    - CREAR un varName para que este pueda tener loc [] de un arreglo
+    - Let all the lexical analysis be done on the servusLex.py file
 '''
 import ply.lex as lex
 import ply.yacc as yacc
 from symbolTable import *
 import sys
 
-# servusSymbolTable = SymbolTable() 
+servusSymbolTable = SymbolTable() 
 
 testProgram = ''' 
 start;
@@ -19,56 +18,7 @@ dim A1, A2, B1, B2 als float;
 dim MAT1[100][100] als float;
 dim MAT2[100][100] als float;
 dim MAT3[100][100] als float;
-
-def READ_MATS{
-    druck "INTRODUCE LOS RENGLONES DE LA 1ERA MATRIZ"; 
-    eingabe A1;
-    druck "INTRODUCE LAS COLUMNAS DE LA 1ERA MATRIZ";
-    eingabe A2;
-    druck "INTRODUCE LOS RENGLONES DE LA 2NDA MATRIZ"; 
-    eingabe B1;
-    druck "INTRODUCE LAS COLUMNAS DE LA 2NDA MATRIZ";
-    eingabe B2;
-    return
-}
-
-def MULTIPLY_MATS{
-    fur i <- 0 in A1{
-        fur j <- 0 in B2{
-            dim sum als float;
-            lass sum <- 0;
-            fur k <- 0 in A2{
-                lass sum <- sum + MAT1[i][k] * MAT2[k][j];
-            }
-            lass MAT3[i][j] <- sum;
-        }
-    }
-    return
-}
-
-def PRINT_MAT3{
-    fur i <- 0 in A1{
-        fur j <- 0 in B2{
-            druck MAT3[i][j];
-            druck "  ";
-        }
-    }
-    return
-}
-
-# AQUI INICIA EL PROGRAMA PRINCIPAL
-def MAIN{
-    druck "Este es un programa para multiplicar dos matrices";
-    tun{
-        gosub READ_MATS;
-    }solange (A2 != B1);
-
-    gosub MULTIPLY_MATS;
-    gosub PRINT_MAT3;
-    return
-}
-
-gosub MAIN;
+dim A2, A3[10] als wort;
 
 ende;
 '''
@@ -237,14 +187,30 @@ def p_let(p):
 def p_while(p):
     """ while : WAEREND logicExpression '{' S '}' """
 
+newType = ""
+newVars = []
 def p_declareVariable(p):
     """
-    declareVariable : ID ',' declareVariable
-        | ID ALS type ';'
+    declareVariable : ID declareVariable1 ALS type ';'
+    declareVariable1 : ',' ID declareVariable1
+        | empty
     type : WORT
         | FLOAT
     """
+    global newType
+    global newVars
     # TODO insert new variable to servusSymbolTable
+    for l in p:
+        if l != None and l != ',':
+            if l == ';':
+                if len(newVars) > 0 and newType != "":
+                    servusSymbolTable.addElements(newVars, newType)
+                    newVars.clear()
+                    newType = ""
+            elif l == "float" or l == "wort":
+                newType = l
+            elif l not in reserved:
+                newVars.append(l)
 
 def p_input(p):
     """
@@ -320,3 +286,4 @@ def testParser():
     # print(result)
 
 testParser()
+servusSymbolTable.displayTable()
