@@ -11,22 +11,67 @@ import sys
 
 # servusSymbolTable = SymbolTable() 
 
-testProgram = ''' start; 
+testProgram = ''' 
+start;
+frei;
+
+dim A1, A2, B1, B2 als float;
+dim MAT1[100][100] als float;
+dim MAT2[100][100] als float;
+dim MAT3[100][100] als float;
+
+def READ_MATS{
+    druck "INTRODUCE LOS RENGLONES DE LA 1ERA MATRIZ"; 
+    eingabe A1;
+    druck "INTRODUCE LAS COLUMNAS DE LA 1ERA MATRIZ";
+    eingabe A2;
+    druck "INTRODUCE LOS RENGLONES DE LA 2NDA MATRIZ"; 
+    eingabe B1;
+    druck "INTRODUCE LAS COLUMNAS DE LA 2NDA MATRIZ";
+    eingabe B2;
+    return
+}
+
 def MULTIPLY_MATS{
     fur i <- 0 in A1{
         fur j <- 0 in B2{
             dim sum als float;
             lass sum <- 0;
             fur k <- 0 in A2{
-               lass sum <- sum + MAT1[i][k] * MAT2[k][j];
+                lass sum <- sum + MAT1[i][k] * MAT2[k][j];
             }
             lass MAT3[i][j] <- sum;
         }
     }
     return
 }
-# COMMENT LINE TESTING
-ende; '''
+
+def PRINT_MAT3{
+    fur i <- 0 in A1{
+        fur j <- 0 in B2{
+            druck MAT3[i][j];
+            druck "  ";
+        }
+    }
+    return
+}
+
+# AQUI INICIA EL PROGRAMA PRINCIPAL
+def MAIN{
+    druck "Este es un programa para multiplicar dos matrices";
+    tun{
+        gosub READ_MATS;
+    }solange (A2 != B1);
+
+    gosub MULTIPLY_MATS;
+    gosub PRINT_MAT3;
+    return
+}
+
+gosub MAIN;
+
+ende;
+'''
 
 reserved = {
     'start' : 'START', 
@@ -123,7 +168,7 @@ def testLexer():
     for tok in lexer:
         print(tok)
 
-testLexer()
+# testLexer()
 
 # Here begins the PARSER
 
@@ -195,11 +240,8 @@ def p_while(p):
 def p_declareVariable(p):
     """
     declareVariable : ID ',' declareVariable
-        | ID ALS type
-    type : dataTypes '[' INTEGER_NUMBER ']' '[' INTEGER_NUMBER ']' ';'
-        | dataTypes '[' INTEGER_NUMBER ']' ';'
-        | dataTypes ';'
-    dataTypes : WORT
+        | ID ALS type ';'
+    type : WORT
         | FLOAT
     """
     # TODO insert new variable to servusSymbolTable
