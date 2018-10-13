@@ -1,18 +1,58 @@
 '''
     TODO:
     - Add the UMINUS token for negative numbers
-    - Let all the lexical analysis be done on the servusLex.py file
+    - Where should the intermediate code should be stored?
+    - How should the intermediate code be constructed?
 '''
 import ply.yacc as yacc
-from symbolTable import *
+from symbolTable import Symbol, SymbolTable
 from servusLex import *
+from collections import deque
 import sys
 
 # ------------------------ GLOBAL VARIABLES ------------------------------------
 servusSymbolTable = SymbolTable() 
 newType = ""
-newVars = []
+availOfTemps = []
+newVars = [] # List used for variable declaration
+arithmLogicOut = []
 # ------------------------------------------------------------------------------
+
+# ----------------------- HELPER FUNCTIONS -------------------------------------
+"""
+    LIST OF INTERMEDIATE CODE INSTRUCTIONS:
+    operator operand1 operand2 storeVariable
+    TODO:
+    - add more fileds to handle special cases.
+    - use temporals for intermediate operations
+    - when currenInstruction is complete, add to the intermediate code
+    - identify if element is a constant or a variable
+    - create the assign instruction
+"""
+def translateLetStatement(target):
+    global servusSymbolTable
+    global arithmLogicOut
+    currentInstruction = []
+    artihmOperators = ('+','-','*','/','%')
+    i = 0
+    if len(arithmLogicOut) == 1:
+        print("ONLY ASSIGN INSTRUCTION")
+        arithmLogicOut.clear()
+    while len(arithmLogicOut) > 1:
+        if arithmLogicOut[i] in artihmOperators:
+            currentInstruction.append(arithmLogicOut.pop(i))
+            currentInstruction.append(arithmLogicOut.pop(i-2))
+            currentInstruction.append(arithmLogicOut.pop(i-2))
+            # currentInstruction.append(top of the avail)
+            currentInstruction.append("temp")
+            print(currentInstruction)
+            currentInstruction.clear()
+            arithmLogicOut.insert(i-2,"temp")
+            i -= 1
+        else:
+            i += 1
+
+    # When the while loop finishes, the only missing instruction is the assignation
 
 # Here begins the PARSER
 
@@ -77,6 +117,15 @@ def p_let(p):
         | logicExpression
         | booleanAssignation
     """
+    global arithmLogicOut
+    global servusSymbolTable
+    if p[1] == "lass":
+        actualSymbol = servusSymbolTable.get(p[2])
+        if actualSymbol == None:
+            print("Variable ", p[2], " was not declared in this scope.")
+        else:
+            # print(arithmLogicOut)
+            translateLetStatement(p[2])
 
 def p_while(p):
     """ while : WAEREND logicExpression '{' S '}' """
@@ -140,6 +189,12 @@ def p_logicExpression(p):
         | FLOAT_NUMBER
         | STRING
     """
+    global arithmLogicOut
+    global servusSymbolTable
+    invalidElements = (None, '(', ')')
+    for element in p:
+        if element not in invalidElements:
+            arithmLogicOut.append(element)
 
 def p_arithmeticExpression(p):
     """
@@ -158,6 +213,12 @@ def p_arithmeticExpression(p):
         | INTEGER_NUMBER
         | FLOAT_NUMBER
     """
+    global arithmLogicOut
+    global servusSymbolTable
+    invalidElements = (None, '(', ')')
+    for element in p:
+        if element not in invalidElements:
+            arithmLogicOut.append(element)
 
 def p_booleanAssignation(p):
     """
@@ -171,8 +232,19 @@ def p_error(p):
 # Build the parser
 parser = yacc.yacc()
 
+testProgram = """
+start;
+frei;
+dim a1,a2 als float;
+lass a1 <- 3.0;
+lass a2 <- 7 + 5 * 8 + 3;
+# Ni;o pelota
+ende;
+
+"""
+
 def testParser():
     result = parser.parse(testProgram)
 
 testParser()
-servusSymbolTable.displayTable()
+# servusSymbolTable.displayTable()
