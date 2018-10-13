@@ -16,7 +16,7 @@ class Symbol:
         self.cols = c
 
     def printSymbol(self):
-        print(self.name, self.type, self.rows, self.cols, self.val)
+        print(self.name, "\t", self.type, "\t", self.rows, "\t", self.cols, "\t", self.val)
 
 class SymbolTable:
     def __init__(self):
@@ -39,6 +39,7 @@ class SymbolTable:
                 col = int(tList[2][:-1])
         return name, row, col
 
+    # TODO What happens if var already exists ??? Right now it will be ignored
     def addElements(self, varList, ty):
         if(ty == "wort"):
             ty = str
@@ -47,7 +48,6 @@ class SymbolTable:
             if newName not in self.symbols:
                 newVar = Symbol(newName, ty, newRow, newCol)
                 self.symbols[newName] = newVar
-            # TODO What happens if var already exists ???
 
 
 
@@ -58,9 +58,6 @@ class SymbolTable:
             return None
 
     def displayTable(self):
+        print("Name\tType\tRows\tCols\tValue")
         for key, val in self.symbols.items():
             val.printSymbol()
-
-
-    
-    
