@@ -1,24 +1,16 @@
-'''
-    TODO:
-    - Add the UMINUS token for negative numbers
-    - Where should the intermediate code should be stored?
-    - How should the intermediate code be constructed?
-'''
-import ply.yacc as yacc
-from symbolTable import Symbol, SymbolTable
 from servusLex import *
-from collections import deque
-import sys
+import ply.yacc as yacc
+from symbolTable import *
+
 
 # ------------------------ GLOBAL VARIABLES ------------------------------------
 servusSymbolTable = SymbolTable() 
 newType = ""
-availOfTemps = []
 newVars = [] # List used for variable declaration
 arithmLogicOut = []
 # ------------------------------------------------------------------------------
 
-# ----------------------- HELPER FUNCTIONS -------------------------------------
+# ------------------------ HELPER FUNCTIONS ------------------------------------
 """
     LIST OF INTERMEDIATE CODE INSTRUCTIONS:
     operator operand1 operand2 storeVariable
@@ -54,8 +46,11 @@ def translateLetStatement(target):
 
     # When the while loop finishes, the only missing instruction is the assignation
 
-# Here begins the PARSER
 
+# ------------------------------------------------------------------------------
+
+
+# Here begins the PARSER
 def p_HEAD(p):
     """ HEAD : START ';' S ENDE ';' """
 
@@ -231,20 +226,3 @@ def p_error(p):
 
 # Build the parser
 parser = yacc.yacc()
-
-testProgram = """
-start;
-frei;
-dim a1,a2 als float;
-lass a1 <- 3.0;
-lass a2 <- 7 + 5 * 8 + 3;
-# Ni;o pelota
-ende;
-
-"""
-
-def testParser():
-    result = parser.parse(testProgram)
-
-testParser()
-# servusSymbolTable.displayTable()
