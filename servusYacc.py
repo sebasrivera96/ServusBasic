@@ -1,13 +1,15 @@
 from servusLex import *
 import ply.yacc as yacc
-from symbolTable import *
-
+from servusSymbolTable import *
+from servusTemp import *
 
 # ------------------------ GLOBAL VARIABLES ------------------------------------
 servusSymbolTable = SymbolTable() 
 newType = ""
 newVars = [] # List used for variable declaration
 arithmLogicOut = []
+# This avail will store temporals to execute the intermediate code
+availOfTemps = []
 # ------------------------------------------------------------------------------
 
 # ------------------------ HELPER FUNCTIONS ------------------------------------
@@ -21,9 +23,23 @@ arithmLogicOut = []
     - identify if element is a constant or a variable
     - create the assign instruction
 """
+def initAvail(n=15):
+    global availOfTemps
+    for i in range(n):
+        t = Temp(int, 0)
+        availOfTemps.append(t)
+
+def getOperators(i):
+    global arithmLogicOut
+    operator = arithmLogicOut.pop(i)
+    firstOperand = arithmLogicOut.pop(i-2)
+    secondOperand = arithmLogicOut.pop(i-2) 
+    return operator, firstOperand, secondOperand        
+
 def translateLetStatement(target):
     global servusSymbolTable
     global arithmLogicOut
+    global availOfTemps
     currentInstruction = []
     artihmOperators = ('+','-','*','/','%')
     i = 0
@@ -32,14 +48,30 @@ def translateLetStatement(target):
         arithmLogicOut.clear()
     while len(arithmLogicOut) > 1:
         if arithmLogicOut[i] in artihmOperators:
-            currentInstruction.append(arithmLogicOut.pop(i))
-            currentInstruction.append(arithmLogicOut.pop(i-2))
-            currentInstruction.append(arithmLogicOut.pop(i-2))
-            # currentInstruction.append(top of the avail)
-            currentInstruction.append("temp")
+            operator, firstOperand, secondOperand = getOperators(i)    
+            currentInstruction.append(operator)
+            # Check if the operands are temporals of the avail
+            if type(firstOperand) == Temp:
+                currentInstruction.append(firstOperand.value)
+                availOfTemps.append(firstOperand)
+                currentType = firstOperand.valueType
+            else:
+                currentInstruction.append(firstOperand)
+                currentType = type(firstOperand)
+            if type(secondOperand) == Temp:
+                currentInstruction.append(secondOperand.value)
+                availOfTemps.append(secondOperand)
+            else:
+                currentInstruction.append(secondOperand)
+            # TODO validate that both operands are of the same value for arithmetic operations
+            t = availOfTemps.pop()
+            t.valueType = currentType
+            currentInstruction.append(t)
             print(currentInstruction)
+            # TODO Code to execute the instruction 
             currentInstruction.clear()
-            arithmLogicOut.insert(i-2,"temp")
+            print("Size of the avail: ", len(availOfTemps))
+            arithmLogicOut.insert(i-2,t) 
             i -= 1
         else:
             i += 1
@@ -224,5 +256,7 @@ def p_booleanAssignation(p):
 def p_error(p):
     print("Syntax error in input! ", p)
 
+#Initialize the Avail of Temporals
+initAvail()
 # Build the parser
 parser = yacc.yacc()

@@ -26,7 +26,7 @@ start;
 frei;
 dim a1,a2 als float;
 lass a1 <- 3.0;
-lass a2 <- 7 + 5 * 8 + 3;
+lass a2 <- 7 + 5 * 8 + 3 * 7 - 10 * (3 + 4);
 ende;
 
 """
