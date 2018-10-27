@@ -15,12 +15,10 @@ availOfTemps = []
 # ------------------------ HELPER FUNCTIONS ------------------------------------
 """
     LIST OF INTERMEDIATE CODE INSTRUCTIONS:
-    operator operand1 operand2 storeVariable
+    operator operand1 operand2 temporalStoreVariable
     TODO:
-    - add more fileds to handle special cases.
-    - use temporals for intermediate operations
+    - Translate the if instruction
     - when currenInstruction is complete, add to the intermediate code
-    - identify if element is a constant or a variable
     - create the assign instruction
 """
 def initAvail(n=15):
@@ -41,7 +39,7 @@ def translateLetStatement(target):
     global arithmLogicOut
     global availOfTemps
     currentInstruction = []
-    artihmOperators = ('+','-','*','/','%')
+    artihmOperators = ('+','-','*','/','%','>','==','<','<=','>=','!=')
     i = 0
     if len(arithmLogicOut) == 1:
         print("ONLY ASSIGN INSTRUCTION")
@@ -78,9 +76,7 @@ def translateLetStatement(target):
 
     # When the while loop finishes, the only missing instruction is the assignation
 
-
 # ------------------------------------------------------------------------------
-
 
 # Here begins the PARSER
 def p_HEAD(p):
@@ -113,6 +109,7 @@ def p_print(p):
     print : DRUCK ID ';'
         | DRUCK STRING ';'
     """
+    print("PRINT: ",p)
 
 def p_clearScreen(p):
     """ clearScreen : FREI ';' """
@@ -122,6 +119,7 @@ def p_if(p):
     if : WENN logicExpression '{' S '}' SONST '{' S '}'
         | WENN logicExpression '{' S '}'
     """
+    print("IF: ",p)
 
 def p_doWhile(p):
     """ doWhile : TUN '{' S '}' SOLANGE logicExpression ';' """
