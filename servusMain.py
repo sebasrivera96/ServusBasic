@@ -24,9 +24,12 @@ import sys
 testProgram = """
 start;
 frei;
-dim a1,a2 als float;
-lass a1 <- 3.0;
-lass a2 <- 7 + 5 * 8 + 3 * 7 - 10 * (3 + 4);
+wenn (3.5 > 2.0) {
+    druck "HOLA MUNDO";
+}
+sonst{
+    druck "FALSE";
+}
 ende;
 
 """
@@ -35,4 +38,5 @@ def testParser():
     result = parser.parse(testProgram)
 
 testParser()
-servusSymbolTable.displayTable()
+# servusSymbolTable.displayTable()
+# printIntermediateCode()
