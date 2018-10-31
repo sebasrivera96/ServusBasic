@@ -24,14 +24,14 @@ import sys
 testProgram = """
 start;
 frei;
-dim a1 als float;
-lass a1 <- 8.9 + 3 - 2;
-wenn (3.5 > 2.0) {
-    druck "HOLA MUNDO";
-}
-sonst{
-    druck "FALSE";
-}
+dim f1, f2, f3 als float;
+# lass f1 <- 8.9 + 3 - 2;
+# lass f2 <- 3.4;
+# lass f3 <- 10 % 5 * (9+ 54);
+tun{
+    druck "This is a doWhile";
+    lass f2  <- f2 - 1;
+}solange (f2 == f3);
 ende;
 
 """

@@ -15,7 +15,8 @@ from servusTemp import *
 
 # --------------------------- TYPES OF OPCODES ---------------------------------
 # - p ==> PRINT
-# - gF ==> GOTO FALSE
+# - gF ==> GOTO on FALSE
+# - gT ==> GOTO on TRUE
 # - g ==> GOTO INCONDICIONAL
 # ------------------------------------------------------------------------------
 
@@ -79,40 +80,46 @@ def getOpCode(l):
         elif isATemporal(l[1]):
             return 'F'
 
+def getOperandValue(operand):
+    global availOfTemps
+    if isATemporal(operand):
+        return operand.value
+        availOfTemps.append(operand)
+    else:
+        return operand
+
 def translateLetStatement(target=None):
     global servusSymbolTable
     global arithmLogicOut
     global availOfTemps
     global intermediateCode
-    artihmOperators = ('+','-','*','/','%','>','==','<','<=','>=','!=','=')
+    artihmOperators = ('+','-','*','/','%','>',"==",'<','<=','>=','!=','=')
     i = 0
+
+    # print(arithmLogicOut)
     while i >=0 and i < len(arithmLogicOut):
         if arithmLogicOut[i] in artihmOperators:
             currentInstruction = []
             if arithmLogicOut[i] == '=':
+                # ['=', valToBeAssigned, var, opCode]
                 currentInstruction.append('=')
                 currentInstruction.append(arithmLogicOut.pop(0)) # Val to be assigned
                 currentInstruction.append(target)
                 currentInstruction.append(getOpCode(currentInstruction))
+                i = -1 # To break the while loop
             else:
                 operator, firstOperand, secondOperand = getOperators(i)    
                 currentInstruction.append(operator)
-                # Check if the operands are temporals of the avail
-                if isATemporal(firstOperand):
-                    currentInstruction.append(firstOperand.value)
-                    availOfTemps.append(firstOperand)
-                    currentType = firstOperand.valueType
-                else:
-                    currentInstruction.append(firstOperand)
-                    currentType = type(firstOperand)
-                if isATemporal(secondOperand):
-                    currentInstruction.append(secondOperand.value)
-                    availOfTemps.append(secondOperand)
-                else:
-                    currentInstruction.append(secondOperand)
-                # TODO validate that both operands are of the same value for arithmetic operations
+
+                # Retrieve the value of the operands [firstOperand, secondOperand]
+                currentInstruction.append(getOperandValue(firstOperand))
+                currentInstruction.append(getOperandValue(secondOperand))
+
+                # TODO validate that both operands are of the same type for arithmetic operations
+                # t.valueType = currentType
+
+                # Take a Temp from avail to store the intermediate result
                 t = availOfTemps.pop()
-                t.valueType = currentType
                 currentInstruction.append(t)
                 # Append the OpCode
                 currentInstruction.append(getOpCode(currentInstruction))
@@ -132,18 +139,22 @@ def printTheP(p):
 
 def printIntermediateCode():
     global intermediateCode
-    print("##################################################################")
-    print("###################### INTERMEDIATE CODE #########################")
-    print("##################################################################")
+    print("\n###################################################################")
+    print("###################### INTERMEDIATE CODE ##########################")
+    print("###################################################################\n")
     i = 0
     for line in intermediateCode:
         print(i,".\t", line)
         i += 1
-    print("##################################################################")
+    print("\n###################################################################\n")
 
 def fillCuadruple(index, val):
     global intermediateCode
     intermediateCode[index].append(val)
+
+def getCont():
+    global intermediateCode
+    return len(intermediateCode)
 
 # ------------------------------------------------------------------------------
 
@@ -200,14 +211,17 @@ def p_checkpoint_if_1(p):
     global intermediateCode
     global availOfTemps
     global stJumps
-    translateLetStatement()
     currentInstruction = ['gf']
+
+    translateLetStatement()
     resultLogicExpression = availOfTemps.pop()
     # TODO validate that the result of logic expr. is a boolean
     currentInstruction.append(resultLogicExpression)
-    availOfTemps.append(resultLogicExpression) # Return temporal to the avail
     stJumps.append(len(intermediateCode)) # Push to jump stack to fill later
     intermediateCode.append(currentInstruction)
+    
+    # Return Temp to the avail
+    availOfTemps.append(resultLogicExpression) 
 
 def p_checkpoint_if_2(p):
     """
@@ -230,7 +244,31 @@ def p_checkpoint_if_3(p):
     fillCuadruple(stJumps.pop(), len(intermediateCode))
 
 def p_doWhile(p):
-    """ doWhile : TUN '{' S '}' SOLANGE logicExpression ';' """
+    """ doWhile : TUN checkpoint_doWhile_1 '{' S '}' SOLANGE logicExpression checkpoint_doWhile_2 ';' """
+
+def p_checkpoint_doWhile_1(p):
+    """ checkpoint_doWhile_1 : empty """
+    global stJumps
+    cont = getCont()
+    stJumps.append(cont)
+
+def p_checkpoint_doWhile_2(p):
+    """ checkpoint_doWhile_2 : empty """
+    global availOfTemps
+    global intermediateCode
+    global stJumps
+    currentInstruction = ['gT']
+    translateLetStatement()
+
+    resultLogicExpression = availOfTemps.pop()
+    # TODO veirfy that resultLogicExpression.valueType == boolean
+    dir = stJumps.pop()
+    currentInstruction.append(resultLogicExpression)
+    currentInstruction.append(dir)
+    intermediateCode.append(currentInstruction)
+
+    # Return Temp to the avail
+    availOfTemps.append(resultLogicExpression)
 
 def p_for(p):
     """
