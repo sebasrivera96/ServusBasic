@@ -83,8 +83,8 @@ def getOpCode(l):
 def getOperandValue(operand):
     global availOfTemps
     if isATemporal(operand):
-        return operand.value
         availOfTemps.append(operand)
+        return operand.value
     else:
         return operand
 
@@ -93,7 +93,7 @@ def translateLetStatement(target=None):
     global arithmLogicOut
     global availOfTemps
     global intermediateCode
-    artihmOperators = ('+','-','*','/','%','>',"==",'<','<=','>=','!=','=')
+    artihmOperators = ('+','-','*','/','%','>','==','<','<=','>=','!=','=','&&','||')
     i = 0
 
     # print(arithmLogicOut)
@@ -106,14 +106,15 @@ def translateLetStatement(target=None):
                 currentInstruction.append(arithmLogicOut.pop(0)) # Val to be assigned
                 currentInstruction.append(target)
                 currentInstruction.append(getOpCode(currentInstruction))
-                i = -1 # To break the while loop
+                
+                # Force a break from while loop
+                arithmLogicOut.pop() 
             else:
                 operator, firstOperand, secondOperand = getOperators(i)    
                 currentInstruction.append(operator)
 
-                # Retrieve the value of the operands [firstOperand, secondOperand]
-                currentInstruction.append(getOperandValue(firstOperand))
-                currentInstruction.append(getOperandValue(secondOperand))
+                currentInstruction.append(firstOperand)
+                currentInstruction.append(secondOperand)
 
                 # TODO validate that both operands are of the same type for arithmetic operations
                 # t.valueType = currentType
@@ -125,11 +126,17 @@ def translateLetStatement(target=None):
                 currentInstruction.append(getOpCode(currentInstruction))
                 arithmLogicOut.insert(i-2,t) 
                 i -= 1
+
+                # Return operands to avail if they areTemps
+                if(type(firstOperand) == Temp):
+                    availOfTemps.append(firstOperand)
+                if(type(secondOperand) == Temp):
+                    availOfTemps.append(secondOperand)
             intermediateCode.append(currentInstruction)
         else:
             i += 1
-    arithmLogicOut.clear()    
-
+    if len(arithmLogicOut) > 0:
+        availOfTemps.append(arithmLogicOut.pop())
 def printTheP(p):
     i = 0
     for tP in p:
@@ -155,6 +162,15 @@ def fillCuadruple(index, val):
 def getCont():
     global intermediateCode
     return len(intermediateCode)
+
+def getResultOfLogicExpression():
+    global availOfTemps
+    translateLetStatement()
+    return availOfTemps.pop()
+
+def returnTempToAvail(t):
+    global availOfTemps
+    availOfTemps.append(t)
 
 # ------------------------------------------------------------------------------
 
@@ -209,19 +225,17 @@ def p_checkpoint_if_1(p):
     checkpoint_if_1 : empty
     """
     global intermediateCode
-    global availOfTemps
     global stJumps
-    currentInstruction = ['gf']
+    currentInstruction = ['gF']
 
-    translateLetStatement()
-    resultLogicExpression = availOfTemps.pop()
+    resultLogicExpression = getResultOfLogicExpression()
     # TODO validate that the result of logic expr. is a boolean
     currentInstruction.append(resultLogicExpression)
     stJumps.append(len(intermediateCode)) # Push to jump stack to fill later
     intermediateCode.append(currentInstruction)
     
     # Return Temp to the avail
-    availOfTemps.append(resultLogicExpression) 
+    returnTempToAvail(resultLogicExpression)
 
 def p_checkpoint_if_2(p):
     """
@@ -254,13 +268,11 @@ def p_checkpoint_doWhile_1(p):
 
 def p_checkpoint_doWhile_2(p):
     """ checkpoint_doWhile_2 : empty """
-    global availOfTemps
     global intermediateCode
     global stJumps
     currentInstruction = ['gT']
-    translateLetStatement()
 
-    resultLogicExpression = availOfTemps.pop()
+    resultLogicExpression = getResultOfLogicExpression()
     # TODO veirfy that resultLogicExpression.valueType == boolean
     dir = stJumps.pop()
     currentInstruction.append(resultLogicExpression)
@@ -268,7 +280,46 @@ def p_checkpoint_doWhile_2(p):
     intermediateCode.append(currentInstruction)
 
     # Return Temp to the avail
-    availOfTemps.append(resultLogicExpression)
+    returnTempToAvail(resultLogicExpression)
+
+def p_while(p):
+    """ while : WAEREND checkpoint_while_1 logicExpression checkpoint_while_2 '{' S '}' checkpoint_while_3 """
+
+def p_checkpoint_while_1(p):
+    """ checkpoint_while_1 : empty """
+    global stJumps
+    cont = getCont()
+    stJumps.append(cont)
+
+def p_checkpoint_while_2(p):
+    """ checkpoint_while_2 : empty """
+    global intermediateCode
+    global stJumps
+    currentInstruction = ['gF']
+
+    resultLogicExpression = getResultOfLogicExpression()
+    # TODO veirfy that resultLogicExpression.valueType == boolean
+    currentInstruction.append(resultLogicExpression)
+    cont = getCont()
+    stJumps.append(cont)
+    intermediateCode.append(currentInstruction)
+
+    # Return Temp to Avail
+    returnTempToAvail(resultLogicExpression)
+
+def p_checkpoint_while_3(p):
+    """ checkpoint_while_3 : empty """
+    global stJumps
+    global intermediateCode
+    currentInstruction = ['g']
+    dir2 = stJumps.pop()
+    dir1 = stJumps.pop()
+    
+    currentInstruction.append(dir1)
+    intermediateCode.append(currentInstruction)
+
+    cont = getCont()
+    fillCuadruple(dir2, cont)
 
 def p_for(p):
     """
@@ -298,9 +349,6 @@ def p_let(p):
         else:
             arithmLogicOut.append('=')
             translateLetStatement(p[2])
-
-def p_while(p):
-    """ while : WAEREND logicExpression '{' S '}' """
 
 def p_declareVariable(p):
     """

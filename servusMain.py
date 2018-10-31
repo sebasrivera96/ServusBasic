@@ -25,15 +25,26 @@ testProgram = """
 start;
 frei;
 dim f1, f2, f3 als float;
-# lass f1 <- 8.9 + 3 - 2;
-# lass f2 <- 3.4;
-# lass f3 <- 10 % 5 * (9+ 54);
-tun{
-    druck "This is a doWhile";
-    lass f2  <- f2 - 1;
-}solange (f2 == f3);
-ende;
+lass f1 <- 8.9 + 3 - 2;
+lass f2 <- 3.4;
+lass f3 <- 10 % 5 * (9+ 54);
 
+waerend (f2 == f3){
+    druck "This is a while";
+    lass f2  <- f2 - 1;
+}
+
+wenn (f2 == 0) || f3 > 0 {
+    druck "IF TRUE";
+}
+sonst {
+    druck "IF FALSE";
+}
+
+tun{
+    druck "dowhile loop";
+} solange ((f2 <= f1) && (f3 != 0));
+ende;
 """
 
 def testParser():

@@ -1,18 +1,5 @@
 import ply.lex as lex
 
-testProgram = ''' 
-start;
-frei;
-
-dim A1, A2, B1, B2 als float;
-dim MAT1[100][100] als float;
-dim MAT2[100][100] als float;
-dim MAT3[100][100] als float;
-dim A2, A3[10] als wort;
-
-ende;
-'''
-
 reserved = {
     'start' : 'START', 
     'ende' : 'ENDE',
@@ -85,6 +72,8 @@ t_StE = r'\<\='
 t_EQUAL = r'\=\='
 t_NOT = r'\!\='
 t_QUOTATION_MARK = r'\"'
+t_UND = r'\&\&'
+t_ODER = r'\|\|'
 # t_UMINUS = r'\-'
 
 # Define a rule so we can track line numbers
