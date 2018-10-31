@@ -24,6 +24,8 @@ import sys
 testProgram = """
 start;
 frei;
+dim a1 als float;
+lass a1 <- 8.9 + 3 - 2;
 wenn (3.5 > 2.0) {
     druck "HOLA MUNDO";
 }
@@ -39,4 +41,4 @@ def testParser():
 
 testParser()
 # servusSymbolTable.displayTable()
-# printIntermediateCode()
+printIntermediateCode()
