@@ -25,10 +25,11 @@ servusSymbolTable = SymbolTable()
 newType = ""
 newVars = []                        # List used for variable declaration
 arithmLogicOut = []
-# This avail will store temporals to execute the intermediate code
-availOfTemps = []
+availOfTemps = []                   # This avail will store temporals to execute the intermediate code                 
 intermediateCode = []
 stJumps = []                        # Stack to save jumps
+stForCounters = []                  # Stack to save the for counters
+forCounter = 0
 # ------------------------------------------------------------------------------
 
 # ------------------------ HELPER FUNCTIONS ------------------------------------
@@ -93,6 +94,7 @@ def translateLetStatement(target=None):
     global arithmLogicOut
     global availOfTemps
     global intermediateCode
+    global forCounter
     artihmOperators = ('+','-','*','/','%','>','==','<','<=','>=','!=','=','&&','||')
     i = 0
 
@@ -137,12 +139,14 @@ def translateLetStatement(target=None):
             i += 1
     if len(arithmLogicOut) > 0:
         availOfTemps.append(arithmLogicOut.pop())
+    
 def printTheP(p):
     i = 0
     for tP in p:
         if tP != None:
             print(i, tP)
         i += 1
+    print("\nLength ==> ", len(p))
 
 def printIntermediateCode():
     global intermediateCode
@@ -323,15 +327,69 @@ def p_checkpoint_while_3(p):
 
 def p_for(p):
     """
-    for : FUR ID LINKER_PFEIL forAssignation IN forTarget '{' S '}'
-    forAssignation : arithmeticExpression
-        | INTEGER_NUMBER
-        | FLOAT_NUMBER
+    for : FUR forAssignation '{' S '}'
+    """
+    global intermediateCode
+    global stJumps
+    global stForCounters
+    cont = getCont()
+
+    # 1. Fill the GOTO ON FALSE from the beginning of the for loop
+    index = stJumps.pop()
+    fillCuadruple(index, cont + 2)
+
+    # 2. Increase ID ++
+    currentInstruction = ['++', stForCounters[-1]]
+    intermediateCode.append(currentInstruction)
+
+    # 3. Create cuadruple of GOTO to logic expression
+    currentInstruction2 = ['g', stJumps.pop()]
+    intermediateCode.append(currentInstruction2)
+
+    printTheP(p)
+
+
+def p_forAssignation(p):
+    """
+    forAssignation : ID LINKER_PFEIL arithmeticExpression IN forTarget
     forTarget : INTEGER_NUMBER
         | FLOAT_NUMBER
         | ID
     """
+    global intermediateCode
+    global stJumps
+    global availOfTemps
+    global stForCounters
 
+    printTheP(p)
+
+    if len(p) > 2:
+        # 1. Generate cuadruples of the arithmetic expression and store result in ID
+        translateLetStatement(p[1])
+
+        # 2. Generate cuadruple to check ID <= forTarget
+        temp = availOfTemps.pop()
+        cont = getCont()
+        currentInstruction = ['<=']
+        currentInstruction.append(p[1])     # ID
+        currentInstruction.append(p[5])     # forTarget
+        currentInstruction.append(temp)     # Temp to store the result
+        stForCounters.append(p[1])
+        stJumps.append(cont)                # Store address to jump & compare again
+        intermediateCode.append(currentInstruction) # ['<=', ID, forTarget, T1]
+
+        # 3. Generate cuadruple GOTO ON FALSE
+        cont = getCont()
+        currentInstruction2 = []
+        currentInstruction2.append('gF')
+        currentInstruction2.append(temp)
+        intermediateCode.append(currentInstruction2) # ['gF', T1, __]
+
+        stJumps.append(cont) # Store index to fill in later
+        returnTempToAvail(temp)
+    else:
+        p[0] = p[1]
+    
 def p_let(p):
     """
     let : LASS ID LINKER_PFEIL letAssignation ';'
