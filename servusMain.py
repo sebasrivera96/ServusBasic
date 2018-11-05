@@ -8,6 +8,7 @@
 from servusLex import *
 from servusYacc import *
 from collections import deque
+from servusInterpreter import *
 import sys
 
 # ------------------------ GLOBAL VARIABLES ------------------------------------
@@ -25,9 +26,10 @@ testProgram = """
 start;
 frei;
 dim f1, f2, f3, i als float;
-# lass f1 <- 8.9 + 3 - 2;
-# lass f2 <- 3.4;
-# lass f3 <- 10 % 5 * (9+ 54);
+lass f1 <- 8.9 + 3 - 2;
+lass f2 <- 3.4;
+lass f3 <- 10 % 6 * (9 + 54);
+lass i <- 9 / 2;
 
 # waerend (f2 == f3){
 #     druck "This is a while";
@@ -38,15 +40,15 @@ dim f1, f2, f3, i als float;
 #     druck "dowhile loop";
 # } solange ((f2 <= f1) && (f3 != 0));
 
-fur i <- (f1+f3) in 8{
-    druck "This is a for loop";
-    wenn (f2 == 0) || f3 > 0 {
-        druck "IF TRUE";
-    }
-    sonst {
-        druck "IF FALSE";
-    }
-}
+# fur i <- (f1+f3) in 8{
+#     druck "This is a for loop";
+#     wenn (f2 == 0) || f3 > 0 {
+#         druck "IF TRUE";
+#     }
+#     sonst {
+#         druck "IF FALSE";
+#     }
+# }
 ende;
 """
 
@@ -54,5 +56,6 @@ def testParser():
     result = parser.parse(testProgram)
 
 testParser()
-servusSymbolTable.displayTable()
 printIntermediateCode()
+executeIntermediateCode()
+servusSymbolTable.displayTable()

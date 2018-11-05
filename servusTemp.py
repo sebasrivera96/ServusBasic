@@ -10,7 +10,7 @@ class Temp:
 
     def set(self, valueType, val):
         self.valueType = valueType
-        self.val = val
+        self.value = val
 
     def get(self):
-        return valueType, val
+        return self.valueType, self.value

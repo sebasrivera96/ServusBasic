@@ -56,6 +56,11 @@ class SymbolTable:
             return None
 
     def displayTable(self):
+        print("\n###################################################################")
+        print("####################### TABLE OF SYMBOLS ##########################")
+        print("###################################################################\n")
         print("Name\tType\tRows\tCols\tValue")
         for key, val in self.symbols.items():
             val.printSymbol()
+        print("\n###################################################################\n")
+        

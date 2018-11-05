@@ -26,7 +26,8 @@ servusSymbolTable = SymbolTable()
 newType = ""
 newVars = []                        # List used for variable declaration
 arithmLogicOut = []
-availOfTemps = []                   # This avail will store temporals to execute the intermediate code                 
+availOfTemps = []                   # This avail will store temporals to execute
+                                    #  the intermediate code                 
 intermediateCode = []
 stJumps = []                        # Stack to save jumps
 stForCounters = []                  # Stack to save the for counters
