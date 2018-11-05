@@ -24,8 +24,7 @@ import sys
 testProgram = """
 start;
 frei;
-dim f1, f2, f3, i
- als float;
+dim f1, f2, f3, i als float;
 # lass f1 <- 8.9 + 3 - 2;
 # lass f2 <- 3.4;
 # lass f3 <- 10 % 5 * (9+ 54);
@@ -35,20 +34,18 @@ dim f1, f2, f3, i
 #     lass f2  <- f2 - 1;
 # }
 
-# wenn (f2 == 0) || f3 > 0 {
-#     druck "IF TRUE";
-# }
-# sonst {
-#     druck "IF FALSE";
-# }
-
 # tun{
 #     druck "dowhile loop";
 # } solange ((f2 <= f1) && (f3 != 0));
 
-fur i <- 0 in 8
-{
+fur i <- (f1+f3) in 8{
     druck "This is a for loop";
+    wenn (f2 == 0) || f3 > 0 {
+        druck "IF TRUE";
+    }
+    sonst {
+        druck "IF FALSE";
+    }
 }
 ende;
 """
@@ -57,5 +54,5 @@ def testParser():
     result = parser.parse(testProgram)
 
 testParser()
-# servusSymbolTable.displayTable()
+servusSymbolTable.displayTable()
 printIntermediateCode()

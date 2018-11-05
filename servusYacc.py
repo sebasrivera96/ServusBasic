@@ -18,6 +18,7 @@ from servusTemp import *
 # - gF ==> GOTO on FALSE
 # - gT ==> GOTO on TRUE
 # - g ==> GOTO INCONDICIONAL
+# - end ==> END OF PROGRAM
 # ------------------------------------------------------------------------------
 
 # ------------------------ GLOBAL VARIABLES ------------------------------------
@@ -181,6 +182,10 @@ def returnTempToAvail(t):
 # Here begins the PARSER
 def p_HEAD(p):
     """ HEAD : START ';' S ENDE ';' """
+    global intermediateCode
+
+    endInstruction = ['end']
+    intermediateCode.append(endInstruction)
 
 def p_S(p):
     """
@@ -346,8 +351,7 @@ def p_for(p):
     currentInstruction2 = ['g', stJumps.pop()]
     intermediateCode.append(currentInstruction2)
 
-    printTheP(p)
-
+    # printTheP(p)
 
 def p_forAssignation(p):
     """
@@ -360,11 +364,13 @@ def p_forAssignation(p):
     global stJumps
     global availOfTemps
     global stForCounters
+    global arithmLogicOut
 
-    printTheP(p)
+    # printTheP(p)
 
     if len(p) > 2:
         # 1. Generate cuadruples of the arithmetic expression and store result in ID
+        arithmLogicOut.append('=')
         translateLetStatement(p[1])
 
         # 2. Generate cuadruple to check ID <= forTarget
