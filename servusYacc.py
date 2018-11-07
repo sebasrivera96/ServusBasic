@@ -2,6 +2,7 @@ from servusLex import *
 import ply.yacc as yacc
 from servusSymbolTable import *
 from servusTemp import *
+import sys
 
 # ---------------------------- TYPES OF CUDRUPLES ------------------------------
 # For arithmetic and logic expressions:
@@ -30,6 +31,7 @@ availOfTemps = []                   # This avail will store temporals to execute
                                     #  the intermediate code                 
 intermediateCode = []
 stJumps = []                        # Stack to save jumps
+stOperands = []                     # Stack to save operands in let statement
 stForCounters = []                  # Stack to save the for counters
 forCounter = 0
 # ------------------------------------------------------------------------------
@@ -182,11 +184,18 @@ def returnTempToAvail(t):
 
 # Here begins the PARSER
 def p_HEAD(p):
-    """ HEAD : START ';' S ENDE ';' """
+    """ HEAD : START checkpointSTART ';' S ENDE ';' """
     global intermediateCode
 
     endInstruction = ['end']
     intermediateCode.append(endInstruction)
+
+def p_checkpointSTART(p):
+    """ checkpointSTART : empty"""
+    global intermediateCode
+
+    beginInstruction = ['start']
+    intermediateCode.append(beginInstruction)
 
 def p_S(p):
     """
@@ -406,8 +415,11 @@ def p_let(p):
     """
     global arithmLogicOut
     global servusSymbolTable
+    global stOperands
+
     if p[1] == "lass":
         actualSymbol = servusSymbolTable.get(p[2])
+        stOperands.append(p[2])
         if actualSymbol == None:
             print("Variable ", p[2], " was not declared in this scope.")
             # TODO call an error function
@@ -511,12 +523,36 @@ def p_arithmeticExpression(p):
 
 def p_booleanAssignation(p):
     """
-    booleanAssignation : logicExpression '?' arithmeticExpression ':' arithmeticExpression
+    booleanAssignation : logicExpression checkpoint_if_1 '?' arithmeticExpression checkpoint_boolean_1 ':' arithmeticExpression checkpoint_boolean_2
+    """
+    global stOperands
+
+
+    # Final Step - Clear the stack of operands 
+    while len(stOperands) > 0:
+        stOperands.pop()
+
+def p_checkpoint_boolean_1(p):
+    """
+    checkpoint_boolean_1 : empty
+    """
+    global intermediateCode
+    global stOperands
+    global availOfTemps
+
+    newValue = availOfTemps[-1].value
+    id = stOperands[-1]
+    currenInstruction = ['=', newValue, id]
+
+def p_checkpoint_boolean_2(p):
+    """
+    checkpoint_boolean_2 : empty
     """
 
 # Error rule for syntax errors
 def p_error(p):
     print("Syntax error in input! ", p)
+    sys.exit("Syntax error in input! ", p)
 
 #Initialize the Avail of Temporals
 initAvail()

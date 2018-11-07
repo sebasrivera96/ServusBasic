@@ -49,6 +49,13 @@ class SymbolTable:
                 newVar = Symbol(newName, ty, newRow, newCol)
                 self.symbols[newName] = newVar
 
+    def getValue(self, varName):
+        tSymbol = self.symbols.get(varName)
+        if tSymbol != None:
+            return tSymbol.val
+        else:
+            return None
+
     def get(self, varName):
         if self.symbols.__contains__(varName):
             return self.symbols[varName]
