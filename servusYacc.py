@@ -359,7 +359,7 @@ def p_for(p):
     fillCuadruple(index, cont + 2)
 
     # 2. Increase ID ++
-    currentInstruction = ['++', stForCounters[-1]]
+    currentInstruction = ['++', stForCounters.pop()]
     intermediateCode.append(currentInstruction)
 
     # 3. Create cuadruple of GOTO to logic expression
@@ -391,13 +391,13 @@ def p_forAssignation(p):
         # 2. Generate cuadruple to check ID <= forTarget
         temp = availOfTemps.pop()
         cont = getCont()
-        currentInstruction = ['<=']
+        currentInstruction = ['<']
         currentInstruction.append(p[1])     # ID
         currentInstruction.append(p[5])     # forTarget
         currentInstruction.append(temp)     # Temp to store the result
         currentInstruction.append('A')      # Type of operation
 
-        # TODO Change the logic to correct the use of the iterators
+        # Push the NEW iterator of the current for LOOP to a Stack
         stForCounters.append(p[1])
         stJumps.append(cont)                # Store address to jump & compare again
         intermediateCode.append(currentInstruction) # ['<=', ID, forTarget, T1]
