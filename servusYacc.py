@@ -3,6 +3,7 @@ import ply.yacc as yacc
 from servusSymbolTable import *
 from servusTemp import *
 import sys
+import os
 
 # ---------------------------- TYPES OF CUDRUPLES ------------------------------
 # For arithmetic and logic expressions:
@@ -231,6 +232,10 @@ def p_print(p):
 
 def p_clearScreen(p):
     """ clearScreen : FREI ';' """
+    global intermediateCode
+
+    clearScreenInstruction = ['cls']
+    intermediateCode.append(clearScreenInstruction)
 
 def p_if(p):
     """
@@ -390,6 +395,9 @@ def p_forAssignation(p):
         currentInstruction.append(p[1])     # ID
         currentInstruction.append(p[5])     # forTarget
         currentInstruction.append(temp)     # Temp to store the result
+        currentInstruction.append('A')      # Type of operation
+
+        # TODO Change the logic to correct the use of the iterators
         stForCounters.append(p[1])
         stJumps.append(cont)                # Store address to jump & compare again
         intermediateCode.append(currentInstruction) # ['<=', ID, forTarget, T1]

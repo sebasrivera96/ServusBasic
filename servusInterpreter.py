@@ -1,6 +1,7 @@
 from servusYacc import *
 from servusSymbolTable import *
 import sys
+import os
 
 # sys.exit("ERROR")
 
@@ -161,14 +162,18 @@ def executeInstruction(instruction):
         symb.val = newValue
 
     elif opCode == "++": # A + 1 -> A
-        symb = servusSymbolTable.get(instruction[2])
+        symb = servusSymbolTable.get(instruction[1])
         symb.val += 1
 
     elif opCode in logicOperators:
         executeLogic(instruction)
 
     elif opCode == "p":
-        print(instruction[1])
+        tVal = servusSymbolTable.getValue(instruction[1])
+        if tVal != None:
+            print(instruction[1], '= ', tVal)
+        else:
+            print(instruction[1][1:-1]) # Remove "" with [1:-1]
 
     elif opCode == "gF":
         if not instruction[1].value:
@@ -184,13 +189,16 @@ def executeInstruction(instruction):
             jumpInstr = instruction[-1]
             instructionIndex = jumpInstr
 
-    # elif opCode == "":
+    elif opCode == "cls":
+        os.system('cls')
 
     # elif opCode == "":
 
     # elif opCode == "":
 
 def printBeginOfProgram():
+    # os.system('cls')
+
     print("\n###################################################################")
     print("##################### ANFANG DES PROGRAMMS ########################")
     print("###################################################################\n")
@@ -209,5 +217,6 @@ def executeIntermediateCode():
         elif instruction[0] == "end":
             printEndOfProgram()
         else:
+            # print("Cuad: ", instructionIndex)
             executeInstruction(instruction)
         

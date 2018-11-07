@@ -24,11 +24,12 @@ import sys
 
 testProgram = """
 start;
-frei;
+# frei;
 dim f1, f2, f3, i als float;
 lass f1 <- 8.9 + 3 - 2;
 lass f2 <- 0;
-lass f3 <- 0 - 3;
+lass f3 <- 3 + 2;
+lass i <- 0;
 # lass i <- (f3 > f2) ? 0 : f2;
 
 wenn (f2 == 0) && f3 > 0 {
@@ -38,24 +39,21 @@ sonst {
     druck "IF FALSE";
 }
 
-# waerend (f2 == f3){
-#     druck "This is a while";
-#     lass f2  <- f2 - 1;
-# }
+waerend (f2 <= f3){
+    druck f2;
+    lass f2  <- f2 + 1;
+}
 
-# tun{
-#     druck "dowhile loop";
-# } solange ((f2 <= f1) && (f3 != 0));
+druck "dowhile loop";
+tun{
+    lass f3 <- f3 + 3;
+    druck f3;
+} solange (f3 < 30);
 
-# fur i <- (f1+f3) in 8{
-#     druck "This is a for loop";
-#     wenn (f2 == 0) || f3 > 0 {
-#         druck "IF TRUE";
-#     }
-#     sonst {
-#         druck "IF FALSE";
-#     }
-# }
+druck "This is a for loop";
+fur i <- 5 in 8{
+    druck i;
+}
 ende;
 """
 
