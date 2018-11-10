@@ -8,12 +8,26 @@ class Symbol:
         self.val = 0.0
         self.name = name
         self.type = type
+        self.rows = r
+        self.cols = c
+
+        # TODO Add one or to lists to store all the elements of the array or matrix
         if(type == str):
             self.val = ""
         elif(type == float):
             self.val = 0.0
-        self.rows = r
-        self.cols = c
+
+        if r > 1:
+           tVal = self.val
+           self.val = []
+           for i in range(self.rows):
+               self.val.append(tVal)
+        
+        if c > 1:
+           tVal = self.val
+           self.val = []
+           for i in range(self.cols):
+               self.val.append(tVal)
 
     def printSymbol(self):
         print(self.name, "\t", self.type, "\t", self.rows, "\t", self.cols, "\t", self.val)
@@ -22,21 +36,48 @@ class SymbolTable:
     def __init__(self):
         self.symbols = {}
 
-    def stripNewVar(self, s):
+    def stripVar(self, s):
+        # TODO Reise error if an element of more than two dimensions is declared
         name = ""
         row = 1
+        str_row = ""
         col = 1
-        if(s.find('[') == -1):
-            # Normal variable is being defined
-            name = s
-        else:
-            tList = s.split('[')
-            name = tList[0]
-            # 1-D array size
-            row = int(tList[1][:-1])
-            if len(tList) == 3:
-                # 2-D array size
-                col = int(tList[2][:-1])
+        str_col = ""
+        index = 0
+        state = 0
+        # 3 states - 0 := name, 1 := row, 2 := col; change concatenation target
+
+        while index < len(s):
+            tC = s[index]
+            index += 1
+
+            if tC == '[':
+                state += 1
+            elif tC == ']':
+                pass
+            else:
+                if state == 0:
+                    name += tC
+                elif state == 1:
+                    str_row += tC
+                elif state == 2:
+                    str_col += tC
+        
+        if str_row != "":
+            try:
+                # Variable declaration
+                row = int(str_row)
+            except: 
+                # Assign a new value
+                row = str_row
+            
+        if str_col != "":
+            try:
+                col = int(str_col)
+            except:
+                col = str_col
+
+        # print(name, type(row), type(col))
         return name, row, col
 
     # TODO What happens if var already exists ??? Right now it will be ignored
@@ -44,7 +85,7 @@ class SymbolTable:
         if(ty == "wort"):
             ty = str
         for elem in varList:
-            newName, newRow, newCol = self.stripNewVar(elem)
+            newName, newRow, newCol = self.stripVar(elem)
             if newName not in self.symbols:
                 newVar = Symbol(newName, ty, newRow, newCol)
                 self.symbols[newName] = newVar
@@ -57,8 +98,9 @@ class SymbolTable:
             return None
 
     def get(self, varName):
-        if self.symbols.__contains__(varName):
-            return self.symbols[varName]
+        tName, tRows, tCols = self.stripVar(varName)
+        if self.symbols.__contains__(tName):
+            return self.symbols[tName]
         else:
             return None
 

@@ -426,6 +426,7 @@ def p_let(p):
     global stOperands
 
     if p[1] == "lass":
+        # Ask for the complete Symbol Object
         actualSymbol = servusSymbolTable.get(p[2])
         stOperands.append(p[2])
         if actualSymbol == None:
@@ -463,6 +464,7 @@ def p_input(p):
     input1 : ',' ID
         | empty
     """
+
 
 precedence = (
     # LOWEST PRIORITY

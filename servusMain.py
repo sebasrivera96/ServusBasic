@@ -1,8 +1,6 @@
 '''
     TODO:
     - Add the UMINUS token for negative numbers
-    - Where should the intermediate code should be stored?
-    - How should the intermediate code be constructed?
 '''
 # from symbolTable import *
 from servusLex import *
@@ -25,7 +23,7 @@ def testParser():
     result = parser.parse(testProgram)
 
 
-testProgram_fileObj = open("servusProgram2.txt",'r')
+testProgram_fileObj = open("servusProgram2.py",'r')
 testProgram = testProgram_fileObj.read()
 
 testParser()
