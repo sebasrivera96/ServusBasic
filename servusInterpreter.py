@@ -151,15 +151,17 @@ def executeInstruction(instruction):
 
     elif opCode == "=": # VAL -> variable
         typeOfOperation = instruction[-1]
-        symb = servusSymbolTable.get(instruction[2])
+        # symb = servusSymbolTable.get(instruction[2])
+        symb = instruction[2]
         # TODO assign a new data-type to the variable, if it changes
 
         if typeOfOperation == 'E':
             newValue = instruction[1]
         elif typeOfOperation == 'F':
             newValue = instruction[1].value
-            
-        symb.val = newValue
+        
+        # symb.val = newValue
+        servusSymbolTable.setValue(symb, newValue)
 
     elif opCode == "++": # A + 1 -> A
         symb = servusSymbolTable.get(instruction[1])

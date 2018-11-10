@@ -27,16 +27,30 @@ class Symbol:
            tVal = self.val
            self.val = []
            for i in range(self.cols):
-               self.val.append(tVal)
+               self.val.append(tVal.copy())
 
     def printSymbol(self):
         print(self.name, "\t", self.type, "\t", self.rows, "\t", self.cols, "\t", self.val)
+
+    def setValue(self, val, i = 1, j = 1):
+        if self.cols > 1: # 2D matrix
+            self.val[i][j] = val
+        elif self.rows > 1: # 1D array
+            self.val[i] = val
+        else:
+            self.val = val
 
 class SymbolTable:
     def __init__(self):
         self.symbols = {}
 
     def stripVar(self, s):
+        """
+        RETURN VALUES:
+        - Normal variable: name(of the variable), 1, 1
+        - 1D Array: name, string(index) | # of rows, 1
+        - 2D Matrix: name, string(index) | # of rows, string(index) | # of cols
+        """
         # TODO Reise error if an element of more than two dimensions is declared
         name = ""
         row = 1
@@ -103,6 +117,16 @@ class SymbolTable:
             return self.symbols[tName]
         else:
             return None
+
+    def setValue(self, varName, newVal):
+        tName, tRows, tCols = self.stripVar(varName)
+        if type(tRows) == str: # Assignation using an index, e.g. i varriable
+            tRows = self.getValue(tRows)
+        if type(tCols) == str: # Assignation using an index, e.g. j variable
+            tCols = self.getValue(tCols)
+        
+        symb = self.get(tName)
+        symb.setValue(newVal, tRows, tCols)
 
     def displayTable(self):
         print("\n###################################################################")
