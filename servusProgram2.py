@@ -8,16 +8,20 @@ dim MAT3[3][3] als float;
 lass f1 <- 8.9 + 3 - 2;
 lass f2 <- 0;
 lass f3 <- 3 + 2;
-
-lass MAT1[0][0] <- 9.6;
+lass i <- 0;
+lass j <- 0;
+lass MAT1[i][j] <- 9;
+lass MAT2[0][0] <- MAT1[i][j];
 
 # lass i <- (f3 > f2) ? 0 : f2;
 
-# fur i <- 0 in 3{
-#     fur j <- 0 in 3{
-#         lass MAT1[i][j] <- 2.3;
-#     }
-# }
+fur i <- 0 in 3{
+    fur j <- 0 in 3{
+        druck i;
+        druck j;
+        lass MAT1[i][j] <- i * j;
+    }
+}
 
 # wenn (f2 == 0) && f3 > 0 {
 #     druck "IF TRUE";

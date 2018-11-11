@@ -18,9 +18,10 @@ import sys
 # ------------------------------------------------------------------------------
 
 # ----------------------- HELPER FUNCTIONS -------------------------------------
-
 def testParser():
     result = parser.parse(testProgram)
+
+# ------------------------------------------------------------------------------
 
 
 testProgram_fileObj = open("servusProgram2.py",'r')
@@ -30,3 +31,5 @@ testParser()
 printIntermediateCode()
 executeIntermediateCode()
 servusSymbolTable.displayTable()
+
+testProgram_fileObj.close()

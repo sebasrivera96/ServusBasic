@@ -427,7 +427,7 @@ def p_let(p):
 
     if p[1] == "lass":
         # Ask for the complete Symbol Object
-        actualSymbol = servusSymbolTable.get(p[2])
+        actualSymbol = servusSymbolTable.getSymbolFromTable(p[2])
         stOperands.append(p[2])
         if actualSymbol == None:
             print("Variable ", p[2], " was not declared in this scope.")

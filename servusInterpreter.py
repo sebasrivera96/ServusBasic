@@ -20,10 +20,12 @@ instructionIndex = 0
 # ------------------------------------------------------------------------------
 
 def cleanOpernd(operand):
-    tVal = servusSymbolTable.getValue(operand)
-    if tVal == None:
+    numeric = [int, float]
+
+    if type(operand) in numeric:
         return operand
     else:
+        tVal = servusSymbolTable.getValue(operand)
         return tVal
 
 def computeValue(op, n1, n2):
@@ -156,7 +158,7 @@ def executeInstruction(instruction):
         # TODO assign a new data-type to the variable, if it changes
 
         if typeOfOperation == 'E':
-            newValue = instruction[1]
+            newValue = servusSymbolTable.getValue(instruction[1])
         elif typeOfOperation == 'F':
             newValue = instruction[1].value
         
@@ -164,7 +166,7 @@ def executeInstruction(instruction):
         servusSymbolTable.setValue(symb, newValue)
 
     elif opCode == "++": # A + 1 -> A
-        symb = servusSymbolTable.get(instruction[1])
+        symb = servusSymbolTable.getSymbolFromTable(instruction[1])
         symb.val += 1
 
     elif opCode in logicOperators:

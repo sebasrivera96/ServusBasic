@@ -3,6 +3,8 @@
     Author: Sebastian Rivera Gonzalez
     Date: 08/OCT/2018
 '''
+import sys
+
 class Symbol:
     def __init__(self, name, type=float, r=1, c=1):
         self.val = 0.0
@@ -32,13 +34,46 @@ class Symbol:
     def printSymbol(self):
         print(self.name, "\t", self.type, "\t", self.rows, "\t", self.cols, "\t", self.val)
 
-    def setValue(self, val, i = 1, j = 1):
-        if self.cols > 1: # 2D matrix
-            self.val[i][j] = val
-        elif self.rows > 1: # 1D array
-            self.val[i] = val
-        else:
+    # TODO Reise error when trying to set a value outside of the valid range, i.e. i or j >= rows or cols
+    def setValue(self, val, i=1, j=1):
+        # numeric = {int, float}
+        # Retrieve the real value of val if necessary, i.e. val not in numeric
+        # if type(val) not in numeric:
+        #     val = val.getValue()
+
+        # Three cases for setting the value:
+        # Normal variable
+        if self.rows == 1 and self.cols == 1:
             self.val = val
+        else:
+            # Reise error if i or j are out of range
+            if i < 0 or i >= self.rows or j < 0 or j >= self.rows:
+                sys.exit("Reference out of range when indexing! i=%d, j=%d" % (i,j))
+
+            # 1D array
+            if self.rows > 1 and self.cols == 1:
+                self.val[i] = val
+            # 2D matrix
+            elif self.rows > 1 and self.cols > 1:
+                self.val[i][j] = val
+
+    # TODO Same as the one from the function above
+    def getValue(self, i=1, j=1):
+        # Three cases for getting the value:
+        # Normal variable
+        if self.rows == 1 and self.cols == 1:
+            return self.val
+        else:
+            # Reise error if i or j are out of range
+            if i < 0 or i >= self.rows or j < 0 or j >= self.rows:
+                sys.exit("Reference out of range when indexing! i=%d, j=%d" % (i,j))
+
+            # 1D array
+            if self.rows > 1 and self.cols == 1:
+                return self.val[i]
+            # 2D matrix
+            elif self.rows > 1 and self.cols > 1:
+                return self.val[i][j]
 
 class SymbolTable:
     def __init__(self):
@@ -104,28 +139,46 @@ class SymbolTable:
                 newVar = Symbol(newName, ty, newRow, newCol)
                 self.symbols[newName] = newVar
 
-    def getValue(self, varName):
-        tSymbol = self.symbols.get(varName)
-        if tSymbol != None:
-            return tSymbol.val
-        else:
-            return None
-
-    def get(self, varName):
+    def getSymbolFromTable(self, varName):
         tName, tRows, tCols = self.stripVar(varName)
         if self.symbols.__contains__(tName):
             return self.symbols[tName]
         else:
             return None
 
-    def setValue(self, varName, newVal):
-        tName, tRows, tCols = self.stripVar(varName)
+    def purifyRowsAndCols(self, tR, tC):
+        tRows = tR
+        tCols = tC
+        
         if type(tRows) == str: # Assignation using an index, e.g. i varriable
             tRows = self.getValue(tRows)
         if type(tCols) == str: # Assignation using an index, e.g. j variable
             tCols = self.getValue(tCols)
+
+        return tRows, tCols
+
+    def getValue(self, varName):
+        numeric = {int, float}
+        # If a varName is a numeric constant, return the value and stop the processing
+        if type(varName) in numeric:
+            return varName
         
-        symb = self.get(tName)
+        # Once here, for sure varName is a str, so begin the process.
+        tName, tRows, tCols = self.stripVar(varName)
+        tRows, tCols = self.purifyRowsAndCols(tRows, tCols)
+        tSymbol = self.getSymbolFromTable(tName) # Reference to Symbol on the SymbolTable
+
+        if tSymbol != None: # Verify that the variable exists already
+            return tSymbol.getValue(tRows, tCols)
+        else:
+            return None
+
+    def setValue(self, varName, newVal):
+        tName, tRows, tCols = self.stripVar(varName)
+        tRows, tCols = self.purifyRowsAndCols(tRows, tCols)
+        # print(tName, tRows, tCols)
+        
+        symb = self.getSymbolFromTable(tName)
         symb.setValue(newVal, tRows, tCols)
 
     def displayTable(self):
