@@ -211,7 +211,7 @@ def p_S(p):
         | let
         | while
         | DIM declareVariable 
-        | EINGABE input ';'
+        | input
         | DEF ID '{' S RETURN '}'
         | GOSUB ID ';'
     """
@@ -460,11 +460,12 @@ def p_declareVariable(p):
 
 def p_input(p):
     """
-    input : ID input1
-    input1 : ',' ID
-        | empty
+    input : EINGABE ID ';'
     """
+    global intermediateCode
 
+    currentInstruction = ["inp", p[2]]
+    intermediateCode.append(currentInstruction)
 
 precedence = (
     # LOWEST PRIORITY
