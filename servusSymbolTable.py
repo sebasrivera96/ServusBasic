@@ -6,6 +6,7 @@
 import sys
 
 class Symbol:
+    
     def __init__(self, name, type=float, r=1, c=1):
         self.val = 0.0
         self.name = name
@@ -76,6 +77,7 @@ class Symbol:
                 return self.val[i][j]
 
 class SymbolTable:
+
     def __init__(self):
         self.symbols = {}
 
@@ -129,24 +131,28 @@ class SymbolTable:
         # print(name, type(row), type(col))
         return name, row, col
 
-    # TODO What happens if var already exists ??? Right now it will be ignored
-    def addElements(self, varList, ty):
-        if(ty == "wort"):
-            ty = str
+    def addElements(self, varList, tType):
+        if(tType == "wort"):
+            tType = str
         for elem in varList:
             newName, newRow, newCol = self.stripVar(elem)
             if newName not in self.symbols:
-                newVar = Symbol(newName, ty, newRow, newCol)
+                newVar = Symbol(newName, tType, newRow, newCol)
                 self.symbols[newName] = newVar
 
     def getSymbolFromTable(self, varName):
         tName, tRows, tCols = self.stripVar(varName)
+        # print(tName)
         if self.symbols.__contains__(tName):
             return self.symbols[tName]
         else:
             return None
 
     def purifyRowsAndCols(self, tR, tC):
+        """
+            Convert the indexes used to access a matrix or array element from
+            vars to an integer value.
+        """
         tRows = tR
         tCols = tC
         
@@ -165,12 +171,16 @@ class SymbolTable:
         
         # Once here, for sure varName is a str, so begin the process.
         tName, tRows, tCols = self.stripVar(varName)
+        # print(tName)
         tRows, tCols = self.purifyRowsAndCols(tRows, tCols)
-        tSymbol = self.getSymbolFromTable(tName) # Reference to Symbol on the SymbolTable
+        # tSymbol = self.getSymbolFromTable(tName) # Reference to Symbol on the SymbolTable
+        tSymbol = self.symbols.get(tName)
 
         if tSymbol != None: # Verify that the variable exists already
+            # tSymbol.printSymbol()
             return tSymbol.getValue(tRows, tCols)
         else:
+            # print("No symbol found")
             return None
 
     def setValue(self, varName, newVal):
@@ -185,7 +195,7 @@ class SymbolTable:
         print("\n###################################################################")
         print("####################### TABLE OF SYMBOLS ##########################")
         print("###################################################################\n")
-        print("Name\tType\tRows\tCols\tValue")
+        print("Name\t\tType\tRows\tCols\tValue")
         for key, val in self.symbols.items():
             val.printSymbol()
         print("\n###################################################################\n")

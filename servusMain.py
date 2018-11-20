@@ -23,13 +23,18 @@ def testParser():
 
 # ------------------------------------------------------------------------------
 
+programToExecute = "servusProgram2.py"
 
-testProgram_fileObj = open("servusProgram2.py",'r')
+if len(sys.argv) > 1:
+    programToExecute = str(sys.argv[1])
+
+testProgram_fileObj = open(programToExecute,'r')
 testProgram = testProgram_fileObj.read()
 
 testParser()
 printIntermediateCode()
 executeIntermediateCode()
 servusSymbolTable.displayTable()
+# printServusSubroutines()
 
 testProgram_fileObj.close()

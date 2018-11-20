@@ -25,8 +25,10 @@ def cleanOpernd(operand):
     if type(operand) in numeric:
         return operand
     else:
+        # print(operand, type(operand))
         tVal = servusSymbolTable.getValue(operand)
-        return tVal
+        # print(tVal, type(tVal))
+        return float(tVal)
 
 def computeValue(op, n1, n2):
 
@@ -109,6 +111,7 @@ def executeLogic(instruction):
     newType = bool
 
     if typeOfOperation == 'A':
+        # print(instruction)
         operand1 = instruction[1]
         operand2 = instruction[2]
 
@@ -140,6 +143,10 @@ def executeLogic(instruction):
         newValue = computeValue(instruction[0], operand1.value, operand2.value)
 
     instruction[-2].set(newType, newValue)
+
+def modifyInstructionIndex(val):
+    global instructionIndex
+    instructionIndex = val
 
 def executeInstruction(instruction):
     global instructionIndex
@@ -178,6 +185,7 @@ def executeInstruction(instruction):
             print(instruction[1], '= ', tVal)
         else:
             print(instruction[1][1:-1]) # Remove "" with [1:-1]
+        print("")
 
     elif opCode == "gF":
         if not instruction[1].value:
@@ -201,10 +209,19 @@ def executeInstruction(instruction):
         symbolToBeAssigned = instruction[1]
         servusSymbolTable.setValue(symbolToBeAssigned, newValue)
 
-    # elif opCode == "":
+    elif opCode == "return":
+        global stReturn
+        modifyInstructionIndex(stReturn.pop())
     
-    # elif opCode == "":
+    elif opCode == "gSub":
+        # Store the index of return in stack stReturn 
+        returnIndex = instruction[-1]
+        appendReturnIndex(returnIndex)
+        # Move to first cuadruple of the subroutine
+        modifyInstructionIndex(instruction[1])
 
+    # elif opCode == "":
+    # elif opCode == "":
     # elif opCode == "":
 
 def printBeginOfProgram():
@@ -219,15 +236,18 @@ def printEndOfProgram():
 
 def executeIntermediateCode():
     global instructionIndex
+    global servusSubroutines
 
     while instructionIndex < len(intermediateCode):
         instruction = intermediateCode[instructionIndex]
         instructionIndex += 1
         if instruction[0] == "start":
             printBeginOfProgram()
+            # instructionIndex = servusSubroutines.get("main")
         elif instruction[0] == "end":
             printEndOfProgram()
         else:
             # print("Cuad: ", instructionIndex)
             executeInstruction(instruction)
+        # print(instructionIndex)
         

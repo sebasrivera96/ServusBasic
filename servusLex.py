@@ -25,7 +25,7 @@ reserved = {
     'lass' : 'LASS'
 }
 
-literals = "+-!@$/&*^()[]{}+=_?;:,<>.|%"
+literals = "+-!@$/&*^()[]{}+=_?;:,<>.|% "
 
 tokens = [
     'ID', 

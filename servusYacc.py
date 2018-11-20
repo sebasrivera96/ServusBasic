@@ -20,6 +20,8 @@ import os
 # - gF ==> GOTO on FALSE
 # - gT ==> GOTO on TRUE
 # - g ==> GOTO INCONDICIONAL
+# - gSub ==> GOTO SUBROUTINE
+# - ret ==> RETURN
 # - end ==> END OF PROGRAM
 # ------------------------------------------------------------------------------
 
@@ -27,14 +29,15 @@ import os
 servusSymbolTable = SymbolTable() 
 newType = ""
 newVars = []                        # List used for variable declaration
-arithmLogicOut = []
+arithmLogicOut = []                 # List used when translating aritmetic & logic operations
 availOfTemps = []                   # This avail will store temporals to execute
                                     #  the intermediate code                 
 intermediateCode = []
 stJumps = []                        # Stack to save jumps
 stOperands = []                     # Stack to save operands in let statement
 stForCounters = []                  # Stack to save the for counters
-forCounter = 0
+stReturn = []                        # Stack of ints used to return to the correct cuadruple
+servusSubroutines = {}              # Key -> str(name of subroutine) : Value -> int(first cudruple)
 # ------------------------------------------------------------------------------
 
 # ------------------------ HELPER FUNCTIONS ------------------------------------
@@ -181,6 +184,28 @@ def returnTempToAvail(t):
     global availOfTemps
     availOfTemps.append(t)
 
+def addSubroutine(subroutineName, firstCuadruple):
+    """
+    Input parameters:
+        - str(subroutineName)
+        - int(firstCuadruple) ==> inside the intermediateCode list
+    """
+    global servusSubroutines
+
+    # if the name is not defined on servusSubroutines, add it
+    if servusSubroutines.get(subroutineName) == None:
+        servusSubroutines[subroutineName] = firstCuadruple
+
+def printServusSubroutines():
+    global servusSubroutines
+    print("\n")
+    for name, firstCuadruple in servusSubroutines.items():
+        print("The subroutine {} begins in the {} cuadruple.\n".format(name, firstCuadruple))
+
+def appendReturnIndex(val):
+    global stReturn
+    stReturn.append(val)
+
 # ------------------------------------------------------------------------------
 
 # Here begins the PARSER
@@ -188,15 +213,21 @@ def p_HEAD(p):
     """ HEAD : START checkpointSTART ';' S ENDE ';' """
     global intermediateCode
 
+    appendReturnIndex(getCont())
+
     endInstruction = ['end']
     intermediateCode.append(endInstruction)
 
 def p_checkpointSTART(p):
     """ checkpointSTART : empty"""
     global intermediateCode
+    global servusSubroutines
 
     beginInstruction = ['start']
     intermediateCode.append(beginInstruction)
+
+    goToMain = ['g']
+    intermediateCode.append(goToMain)
 
 def p_S(p):
     """
@@ -212,8 +243,8 @@ def p_S(p):
         | while
         | DIM declareVariable 
         | input
-        | DEF ID '{' S RETURN '}'
-        | GOSUB ID ';'
+        | funcDefine
+        | goSub
     """
 
 def p_empty(p):
@@ -559,6 +590,43 @@ def p_checkpoint_boolean_2(p):
     """
     checkpoint_boolean_2 : empty
     """
+
+def p_goSub(p):
+    """
+    goSub : GOSUB ID ';'
+    """
+    global intermediateCode
+    global servusSubroutines
+
+    # - Create cuadruple for going to the beginning line of the subroutine 'ID'
+    indexToJump = servusSubroutines.get(p[2])
+    returnIndex = getCont() + 1
+
+    currentInstruction = ["gSub", indexToJump, returnIndex]
+    intermediateCode.append(currentInstruction)
+
+def p_funcDefine(p):
+    """
+    funcDefine : DEF checkpoint_funcDefine_1 '{' S RETURN ';' '}'
+    """
+    global intermediateCode
+    
+    # When the parsing is complete, store the return statement
+    currentInstruction = ["return"]
+    intermediateCode.append(currentInstruction)
+
+def p_checkpoint_funcDefine_1(p):
+    """
+    checkpoint_funcDefine_1 : ID
+    """
+    subroutineName = p[1]
+    firstCuadruple = getCont()
+
+    # 1) Add subroutine to the Table (Name = ID, Val = len(intermediateCode))
+    addSubroutine(subroutineName, firstCuadruple)
+
+    if subroutineName == 'main':
+        fillCuadruple(1, firstCuadruple)
 
 # Error rule for syntax errors
 def p_error(p):
