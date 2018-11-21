@@ -58,10 +58,10 @@ class Symbol:
 
             # 1D array
             if self.rows > 1 and self.cols == 1:
-                self.val[i] = val
+                self.val[int(i)] = val
             # 2D matrix
             elif self.rows > 1 and self.cols > 1:
-                self.val[i][j] = val
+                self.val[int(i)][int(j)] = val
 
     # TODO Same as the one from the function above
     def getValue(self, i=1, j=1):
