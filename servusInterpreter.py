@@ -25,9 +25,7 @@ def cleanOpernd(operand):
     if type(operand) in numeric:
         return operand
     else:
-        # print(operand, type(operand))
         tVal = servusSymbolTable.getValue(operand)
-        # print(tVal, type(tVal))
         return float(tVal)
 
 def computeValue(op, n1, n2):

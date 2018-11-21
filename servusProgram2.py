@@ -6,7 +6,14 @@ dim MAT2[3][3] als float;
 dim MAT3[3][3], arr1[3] als float;
 dim arr2[3] als float;
 
-eingabe f1;
+def main{
+    eingabe f3;
+    fur f1 <- 0 in f3{
+        lass arr1[f1] <- 5.4;
+        # druck arr1[f1];
+    }
+    return ;
+}
 
 # lass f1 <- 8.9 + 3 - 2;
 # lass f2 <- 0;
@@ -18,16 +25,12 @@ eingabe f1;
 
 # lass i <- (f3 > f2) ? 0 : f2;
 
-# fur i <- 0 in 3{
+# fur i <- 0 in f3{
 #     fur j <- 0 in 3{
 #         druck i;
 #         druck j;
 #         lass MAT1[i][j] <- i * j;
 #     }
-# }
-
-# fur f1 <- 0 in 3{
-#     lass arr1[f1] <- 5.4;
 # }
 
 # wenn (f2 == 0) && f3 > 0 {

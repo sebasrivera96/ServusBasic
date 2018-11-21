@@ -424,9 +424,11 @@ def p_forAssignation(p):
         cont = getCont()
         currentInstruction = ['<']
         currentInstruction.append(p[1])     # ID
-        currentInstruction.append(p[5])     # forTarget
-        currentInstruction.append(temp)     # Temp to store the result
-        currentInstruction.append('A')      # Type of operation
+        forTarget = p[5]
+        # print(forTarget, type(forTarget))
+        currentInstruction.append(forTarget)        # forTarget
+        currentInstruction.append(temp)             # Temp to store the result
+        currentInstruction.append('A')              # Type of operation
 
         # Push the NEW iterator of the current for LOOP to a Stack
         stForCounters.append(p[1])

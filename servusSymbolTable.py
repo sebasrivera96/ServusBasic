@@ -33,8 +33,13 @@ class Symbol:
                self.val.append(tVal.copy())
 
     def printSymbol(self):
-        print(self.name, "\t", self.type, "\t", self.rows, "\t", self.cols, "\t", self.val)
-
+        if self.rows == 1 and self.cols == 1:
+            print(self.name, "\t", self.type, "\t", self.rows, "\t", self.cols, "\t", self.val)
+        else:
+            print(self.name, "\t", self.type, "\t", self.rows, "\t", self.cols, "\n")
+            for r in range(self.rows):
+                    print(self.val[r])
+                
     # TODO Reise error when trying to set a value outside of the valid range, i.e. i or j >= rows or cols
     def setValue(self, val, i=1, j=1):
         # numeric = {int, float}
