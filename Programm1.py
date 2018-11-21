@@ -54,14 +54,8 @@ def sumMats{
                 lass Mat3[i][j] <- Mat1[i][j] + Mat2[i][j]; 
             }
         }
-
-        
-        # fur i <- 0 in Reihen3{
-        #     fur j <- 0 in Spalten3{
-        #         # lass Mat3[i][j] <- Mat1[i][j] + Mat2[i][j]; 
-        #         druck Mat3[i][j];
-        #     }
-        # }
+        druck "Antowort in Mat3";
+        druck Mat3;
     }
     sonst{
         druck "Die Matrizen konnten nicht addiert werden";
@@ -84,6 +78,8 @@ def multMats{
                 } 
             }
         }
+        druck "Antowort in Mat3";
+        druck Mat3;        
     }
     sonst{
         druck "Die Matrizen konnten nicht multiplitziert werden";

@@ -5,13 +5,12 @@ dim MAT1[3][3] als float;
 dim MAT2[3][3] als float;
 dim MAT3[3][3], arr1[3] als float;
 dim arr2[3] als float;
+dim sA, sB als wort;
 
 def main{
-    eingabe f3;
-    fur f1 <- 0 in f3{
-        lass arr1[f1] <- 5.4;
-        # druck arr1[f1];
-    }
+    lass sA <- "Juan";
+    lass sB <- "Pedro";
+    
     return ;
 }
 

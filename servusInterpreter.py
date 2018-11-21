@@ -178,9 +178,12 @@ def executeInstruction(instruction):
         executeLogic(instruction)
 
     elif opCode == "p":
-        tVal = servusSymbolTable.getValue(instruction[1])
-        if tVal != None:
-            print(instruction[1], '= ', tVal)
+        # tVal = servusSymbolTable.getValue(instruction[1])
+        tSymbol = servusSymbolTable.getSymbolFromTable(instruction[1])
+        
+        if tSymbol != None:
+            # print(instruction[1], '= ', tVal)
+            tSymbol.printValue()
         else:
             print(instruction[1][1:-1]) # Remove "" with [1:-1]
         print("")

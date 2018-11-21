@@ -32,9 +32,9 @@ testProgram_fileObj = open(programToExecute,'r')
 testProgram = testProgram_fileObj.read()
 
 testParser()
-printIntermediateCode()
+# printIntermediateCode()
 executeIntermediateCode()
-servusSymbolTable.displayTable()
+# servusSymbolTable.displayTable()
 # printServusSubroutines()
 
 testProgram_fileObj.close()
