@@ -76,10 +76,17 @@ class Symbol:
 
             # 1D array
             if self.rows > 1 and self.cols == 1:
-                return self.val[i]
+                return self.val[int(i)]
             # 2D matrix
             elif self.rows > 1 and self.cols > 1:
-                return self.val[i][j]
+                return self.val[int(i)][int(j)]
+
+    def printValue(self):
+        if self.rows > 1 and self.cols > 1:
+            for i in range(self.rows):
+                print(self.val[i])
+        else:
+            print(self.val)
 
 class SymbolTable:
 
